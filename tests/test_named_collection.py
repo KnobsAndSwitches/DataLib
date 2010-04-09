@@ -49,9 +49,9 @@ def test_formatted_columns():
     col = NamedCollection(names, data)
 
     col.add_formatted_column('d', '{c} {a} {b}')
-    assert col[0]['d'] == 'baz foo bar'
+    assert col.dict_rows()[0]['d'] == 'baz foo bar'
 
     col = NamedCollections(names, data, 
             formatted_columns=(('d', '{c} {b} {a}'),))
-    assert col[0]['d'] == 'baz bar foo'
+    assert col.dict_rows()[0]['d'] == 'baz bar foo'
 

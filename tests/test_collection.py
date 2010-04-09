@@ -35,6 +35,6 @@ def test_formatted_columns():
     col.add_formatted_column('{2} {0} {1}')
     assert col[0][3] == 'baz foo bar'
 
-    col = Collection(STRING_DATA, formatted_columns=('{c} {b} {a}',))
+    col = Collection(STRING_DATA, formatted_columns=('{2} {1} {0}',))
     assert col[0][3] == 'baz bar foo'
 
