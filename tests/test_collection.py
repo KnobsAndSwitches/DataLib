@@ -16,6 +16,8 @@
 
 """Test Collection."""
 
+from py.test import raises
+
 from datalib.collections import Collection
 
 
@@ -43,7 +45,7 @@ def test_transaction_verbose():
     col = Collection(STRING_DATA)
     assert col.transaction.active == False
 
-    col.transaction.start()
+    col.transaction.begin()
     assert col.transaction.active == True
     assert len(col.transaction) == 0
 
@@ -54,7 +56,7 @@ def test_transaction_verbose():
     assert len(col.transaction) == 0
     assert col.transaction.active == False
 
-    col.transaction.start()
+    col.transaction.begin()
     col.add_formatted_column('{0}, {1}')
     col.transaction.commit()
     assert col[0][3] == 'foo, bar'
