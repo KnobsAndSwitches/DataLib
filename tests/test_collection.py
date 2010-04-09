@@ -38,3 +38,37 @@ def test_formatted_columns():
     col = Collection(STRING_DATA, formatted_columns=('{2} {1} {0}',))
     assert col[0][3] == 'baz bar foo'
 
+
+def test_transaction_verbose():
+    col = Collection(STRING_DATA)
+    assert col.transaction.active == False
+
+    col.transaction.start()
+    assert col.transaction.active == True
+    assert len(col.transaction) == 0
+
+    col.add_formatted_column('{0}, {1}')
+    assert len(col.transaction) == 1
+
+    col.transaction.rollback()
+    assert len(col.transaction) == 0
+    assert col.transaction.active == False
+
+    col.transaction.start()
+    col.add_formatted_column('{0}, {1}')
+    col.transaction.commit()
+    assert col[0][3] == 'foo, bar'
+
+
+def test_transaction_with():
+    col = Collection(STRING_DATA)
+
+    with col:
+        col.add_formatted_column('{0}, {1}')
+        col.transaction.rollback()
+    raises(IndexError, 'col[0][3]')
+
+    with col:
+        col.add_formatted_column('{0}, {1}')
+    assert col[0][3] == 'foo, bar'
+
