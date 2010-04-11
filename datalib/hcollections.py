@@ -16,7 +16,7 @@
 
 """Homogeneous data collections."""
 
-from datalib.transaction import Transaction, TransactionNotActiveError
+from datalib.transaction import Transaction
 
 
 class Collection(object):
@@ -79,17 +79,7 @@ class Collection(object):
         def _do_format(row, collection):
             row.append(fmt.format(*row))
 
-        self._row_update(_do_format)
-
-
-    def _row_update(self, fun):
-        """Apply row modification or update."""
-        if self.transaction.active:
-            self.transaction.add('new_cols', fun)
-        else:
-            self.transaction.begin()
-            self.transaction.add('new_cols', fun)
-            self.transaction.commit()
+        self.transaction.add('new_cols', _do_format)
 
 
     def _handle_kwargs(self, **kwargs):
@@ -147,7 +137,7 @@ class NamedCollection(Collection):
             collection.names.append(name)
             row.append(fmt.format(*row))
 
-        self._row_update(_do_format)
+        self.transaction.add('new_cols', _do_format)
 
 
     def _handle_kwargs(self, **kwargs):

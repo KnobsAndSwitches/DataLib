@@ -27,10 +27,6 @@ class TransactionAlreadyActiveError(Exception):
     pass
 
 
-class TransactionNotActiveError(Exception):
-    pass
-
-
 class Transaction(object):
     """Collection transaction."""
 
@@ -68,10 +64,13 @@ class Transaction(object):
         >>> len(t)
         1
         """
-        if self.active:
+        self._instructions[type].append(instruction)
+
+        # If session is not actively in use, apply atomically
+        if not self.active:
+            self.begin()
             self._instructions[type].append(instruction)
-        else:
-            raise TransactionNotActiveError
+            self.commit()
 
 
     def rollback(self):
@@ -113,6 +112,7 @@ class Transaction(object):
                 raise DependencyResolutionError
         else:
             self.active = False
+            self.instructions = defaultdict(list)
 
 
     def _commit_filter(self, instructions):
