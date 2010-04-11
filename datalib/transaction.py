@@ -16,9 +16,11 @@
 
 """Collection change transaction."""
 
+from collections import defaultdict
 
-INSTRUCTION_ROW = 0
-INSTRUCTION_COL = 1
+
+class DependencyResolutionError(Exception):
+    pass
 
 
 class TransactionAlreadyActiveError(Exception):
@@ -35,7 +37,7 @@ class Transaction(object):
     def __init__(self, collection):
         self.active = False
         self._collection = collection
-        self._instructions = []
+        self._instructions = defaultdict(list)
 
 
     def __len__(self):
@@ -49,12 +51,12 @@ class Transaction(object):
         not appear till the transaction is committed."""
         if not self.active:
             self.active = True
-            self._instructions = []
+            self._instructions = defaultdict(list)
         else:
             raise TransactionAlreadyActiveError
 
 
-    def add_row_instruction(self, instruction):
+    def add(self, type, instruction):
         """Add row-level instruction to todo list on commit.
 
         >>> from datalib.collections import Collection
@@ -67,24 +69,9 @@ class Transaction(object):
         1
         """
         if self.active:
-            self._instructions.append((INSTRUCTION_ROW, instruction))
+            self._instructions[type].append(instruction)
         else:
             raise TransactionNotActiveError
-
-
-    def commit(self):
-        """Apply requested instructions to bound collection."""
-        # Make sure our dataset is mutable
-        self._collection.data = list(self._collection.data)
-
-        for idx, row in enumerate(self._collection):
-            row = list(row) # make sure our row is mutable
-            for inst_type, inst_fun in self._instructions:
-                if inst_type == INSTRUCTION_ROW:
-                    inst_fun(row, self._collection)
-                    self._collection.data[idx] = row
-
-        self.active = False
 
 
     def rollback(self):
@@ -103,5 +90,64 @@ class Transaction(object):
         0
         """
         self.active = False
-        self._instructions = []
+        self._instructions = defaultdict(list)
+
+
+    def commit(self, start_at=0, last_errors=None):
+        """Apply requested instructions to bound collection."""
+        # Make sure our dataset is mutable
+        self._collection.data = list(self._collection.data)
+        errors, first_err_at = [], 99
+        
+        for idx, (name, commit_method) in enumerate(self.commit_methods):
+            try:
+                commit_method(self, self._instructions[name])
+            except IndexError, ex:
+                errors.append(ex)
+                first_err_at = min(first_err_at, idx)
+
+        if errors:
+            if errors != last_errors:
+                self.commit(first_err_at, errors)
+            else:
+                raise DependencyResolutionError
+        else:
+            self.active = False
+
+
+    def _commit_filter(self, instructions):
+        """Apply requested filters to collection."""
+        pass
+
+
+    def _commit_group(self, instructions):
+        """Apply requested group opperations to collection."""
+        pass
+
+
+    def _commit_new_cols(self, instructions):
+        """Add calculated and formatted columns to collection."""
+        for idx, row in enumerate(self._collection):
+            row = list(row) # make sure our row is mutable
+            for instruction in instructions:
+                instruction(row, self._collection)
+            self._collection.data[idx] = row
+
+
+    def _commit_aggregate(self, instructions):
+        """Apply column aggregations."""
+        pass
+
+
+    def _commit_sort(self, instructions):
+        """Apply sort rules."""
+        pass
+
+
+    commit_methods = (
+            ('filter', _commit_filter),
+            ('group', _commit_group),
+            ('new_cols', _commit_new_cols),
+            ('aggregate', _commit_aggregate),
+            ('sort', _commit_sort),)
 

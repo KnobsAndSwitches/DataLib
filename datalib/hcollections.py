@@ -85,10 +85,10 @@ class Collection(object):
     def _row_update(self, fun):
         """Apply row modification or update."""
         if self.transaction.active:
-            self.transaction.add_row_instruction(fun)
+            self.transaction.add('new_cols', fun)
         else:
             self.transaction.begin()
-            self.transaction.add_row_instruction(fun)
+            self.transaction.add('new_cols', fun)
             self.transaction.commit()
 
 

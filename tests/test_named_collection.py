@@ -16,10 +16,10 @@
 
 """Test NamedCollection."""
 
-from datalib.collections import NamedCollection
+from datalib.hcollections import NamedCollection
 
 
-BASIC_DATA = ('a', 'b', 'c'), ((1,2,3),(4,5,6))
+BASIC_DATA = ('a', 'b', 'c'), [[1,2,3],[4,5,6]]
 STRING_DATA = ('a', 'b', 'c'), (('foo', 'bar', 'baz'),)
 
 

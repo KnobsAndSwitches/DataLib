@@ -18,7 +18,7 @@
 
 from py.test import raises
 
-from datalib.collections import Collection
+from datalib.hcollections import Collection
 
 
 BASIC_DATA = ((1,2,3),(4,5,6))
