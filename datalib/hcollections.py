@@ -25,7 +25,7 @@ class Collection(object):
     Example:
     >>> Collection(((1,2,3), (2,3,4)))
     <Collection 2 rows, 3 columns>
-    >>> Collection()
+    >>> Collection([])
     <Collection Empty>
     """
 
@@ -106,7 +106,7 @@ class NamedCollection(Collection):
     Example:
     >>> NamedCollection(('a', 'b', 'c'), ((1,2,3), (4,5,6)))
     <NamedCollection 2 rows, 3 columns>
-    >>> NamedCollection()
+    >>> NamedCollection([], [])
     <NamedCollection Empty>
     """
     
@@ -127,8 +127,8 @@ class NamedCollection(Collection):
         """Return iterator yielding a dictionary per row.
 
         >>> col = NamedCollection(('a', 'b'), ((1,2),(3,4)))
-        >>> col.dict_rows()[0]
-        {'a': 1, 'b', 2}
+        >>> list(col.dict_rows())[0]
+        {'a': 1, 'b': 2}
         """
         return (dict(zip(self.names, x)) for x in self.data)
 
@@ -136,7 +136,7 @@ class NamedCollection(Collection):
     def add_formatted_column(self, name, fmt):
         """Add new named formatted column.
 
-        >>> col = Collection(('a', 'b'), (('foo', 'bar'),))
+        >>> col = NamedCollection(('a', 'b'), (('foo', 'bar'),))
         >>> col.add_formatted_column('c', '{b}, {a}')
         >>> col[0]
         ['foo', 'bar', 'bar, foo']
