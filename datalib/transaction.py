@@ -59,12 +59,12 @@ class Transaction(object):
     def add(self, type, instruction):
         """Add row-level instruction to todo list on commit.
 
-        >>> from datalib.collections import Collection
+        >>> from datalib.hcollections import Collection
         >>> t = Transaction(Collection([]))
         >>> t.begin()
         >>> len(t)
         0
-        >>> t.add_row_instruction(lambda x: x)
+        >>> t.add('add_cols', lambda x: x)
         >>> len(t)
         1
         """
@@ -77,10 +77,10 @@ class Transaction(object):
     def rollback(self):
         """Erase list of transaction instructions and deactivate transaction.
 
-        >>> from datalib.collections import Collection
+        >>> from datalib.hcollections import Collection
         >>> t = Transaction(Collection([]))
         >>> t.begin()
-        >>> t.add_row_instruction(lambda x, y: x)
+        >>> t.add('add_cols', lambda x, y: x)
         >>> len(t)
         1
         >>> t.rollback()
