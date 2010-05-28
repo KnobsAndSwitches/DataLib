@@ -33,7 +33,13 @@ class Collection(object):
         self.data = data
         self.transaction = Transaction(self)
 
-        self._handle_kwargs(**kwargs)
+        # Add filters
+        def _common_kwarg_handling():
+            if 'filter' in kwargs:
+                for filter_fn in kwargs['filter']:
+                    self.filter(filter_fn)
+
+        self._handle_kwargs(_common_kwarg_handling, **kwargs)
 
 
     def __len__(self):
@@ -91,9 +97,10 @@ class Collection(object):
         self.transaction.add('filter', fn)
 
 
-    def _handle_kwargs(self, **kwargs):
+    def _handle_kwargs(self, common_kwarg_handling, **kwargs):
         """Handle kwargs passed in on __init__."""
         with self:
+            common_kwarg_handling()
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(col)
@@ -149,9 +156,10 @@ class NamedCollection(Collection):
         self.transaction.add('new_cols', _do_format)
 
 
-    def _handle_kwargs(self, **kwargs):
+    def _handle_kwargs(self, common_kwarg_handling, **kwargs):
         """Handle kwargs passed in on __init__."""
         with self:
+            common_kwarg_handling()
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(*col)

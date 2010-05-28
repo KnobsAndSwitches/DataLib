@@ -61,3 +61,6 @@ def test_filter():
     col.filter(lambda x: x['a'] < 2)
     assert len(col) == 1
 
+    col = NamedCollection(*BASIC_DATA, filter=(lambda x: x['a'] < 2,))
+    assert len(col) == 1
+

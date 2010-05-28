@@ -80,3 +80,6 @@ def test_filter():
     col.filter(lambda x: x[0] < 2)
     assert len(col) == 1
 
+    col = Collection(BASIC_DATA, filter=(lambda x: x[0] < 2,))
+    assert len(col) == 1
+
