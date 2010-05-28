@@ -74,3 +74,9 @@ def test_transaction_with():
         col.add_formatted_column('{0}, {1}')
     assert col[0][3] == 'foo, bar'
 
+
+def test_filter():
+    col = Collection(BASIC_DATA)
+    col.filter(lambda x: x[0] < 2)
+    assert len(col) == 1
+

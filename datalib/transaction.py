@@ -16,7 +16,8 @@
 
 """Collection change transaction."""
 
-from collections import defaultdict
+from collections import defaultdict, Mapping
+from itertools import ifilter
 
 
 class DependencyResolutionError(Exception):
@@ -117,7 +118,19 @@ class Transaction(object):
 
     def _commit_filter(self, instructions):
         """Apply requested filters to collection."""
-        pass
+        col = iter(self._collection)
+        for instruction in instructions:
+            col = ifilter(instruction, col)
+
+        col = list(col)
+        if not col:
+            self._collection.data = []
+        else:
+            if isinstance(col[0], Mapping):
+                self._collection.data = [
+                        [x[y] for y in self._collection.names] for x in col]
+            else:
+                self._collection.data = list(col)
 
 
     def _commit_group(self, instructions):
@@ -128,7 +141,10 @@ class Transaction(object):
     def _commit_new_cols(self, instructions):
         """Add calculated and formatted columns to collection."""
         for idx, row in enumerate(self._collection):
-            row = list(row) # make sure our row is mutable
+            if isinstance(row, Mapping):
+                row = self._collection.data[idx]
+            else:
+                row = list(row)
             for instruction in instructions:
                 instruction(row, self._collection)
             self._collection.data[idx] = row

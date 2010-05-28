@@ -36,6 +36,10 @@ class Collection(object):
         self._handle_kwargs(**kwargs)
 
 
+    def __len__(self):
+        return len(self.data)
+
+
     def __iter__(self):
         return iter(self.data)
 
@@ -82,6 +86,11 @@ class Collection(object):
         self.transaction.add('new_cols', _do_format)
 
 
+    def filter(self, fn):
+        """Filter rows that match given function."""
+        self.transaction.add('filter', fn)
+
+
     def _handle_kwargs(self, **kwargs):
         """Handle kwargs passed in on __init__."""
         with self:
@@ -113,11 +122,11 @@ class NamedCollection(Collection):
             return "<NamedCollection Empty>"
 
 
-    def dict_rows(self):
+    def __iter__(self):
         """Return iterator yielding a dictionary per row.
 
         >>> col = NamedCollection(('a', 'b'), ((1,2),(3,4)))
-        >>> list(col.dict_rows())[0]
+        >>> list(col.__iter__())[0]
         {'a': 1, 'b': 2}
         """
         return (dict(zip(self.names, x)) for x in self.data)

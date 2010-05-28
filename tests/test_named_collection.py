@@ -30,7 +30,7 @@ def test_create_named():
     assert list(col.names) == list(names)
     assert list(col.data) == list(data)
 
-    for idx, row in enumerate(col):
+    for idx, row in enumerate(col.data):
         assert list(row) == list(data[idx])
 
 
@@ -38,7 +38,7 @@ def test_dict_rows():
     names, data = BASIC_DATA
     col = NamedCollection(names, data)
 
-    for idx, row in enumerate(col.dict_rows()):
+    for idx, row in enumerate(col):
         row_names, row_values = zip(*row.iteritems())
         assert set(row_names) == set(names)
         assert set(row_values) == set(data[idx])
@@ -49,9 +49,15 @@ def test_formatted_columns():
     col = NamedCollection(names, data)
 
     col.add_formatted_column('d', '{c} {a} {b}')
-    assert list(col.dict_rows())[0]['d'] == 'baz foo bar'
+    assert list(col)[0]['d'] == 'baz foo bar'
 
     col = NamedCollection(names, data, 
             formatted_columns=(('d', '{c} {b} {a}'),))
-    assert list(col.dict_rows())[0]['d'] == 'baz bar foo'
+    assert list(col)[0]['d'] == 'baz bar foo'
+
+
+def test_filter():
+    col = NamedCollection(*BASIC_DATA)
+    col.filter(lambda x: x['a'] < 2)
+    assert len(col) == 1
 
