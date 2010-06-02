@@ -17,7 +17,7 @@
 """Collection change transaction."""
 
 from collections import defaultdict, Mapping
-from itertools import ifilter
+from itertools import ifilter, chain, groupby
 
 
 class DependencyResolutionError(Exception):
@@ -100,6 +100,8 @@ class Transaction(object):
         errors, first_err_at = [], 99
         
         for idx, (name, commit_method) in enumerate(self.commit_methods):
+            if name not in self._instructions:
+                continue
             try:
                 commit_method(self, self._instructions[name])
             except IndexError, ex:
@@ -135,7 +137,32 @@ class Transaction(object):
 
     def _commit_group(self, instructions):
         """Apply requested group opperations to collection."""
-        pass
+        try:
+            groupinst = list(chain(*instructions))[0]
+        except IndexError:
+            return
+
+        if not callable(groupinst):
+            groupfn = lambda x: x[groupinst]
+            if hasattr(self._collection, 'names'):
+                groupinst_key = self._collection.names.index(groupinst)
+            else:
+                groupinst_key = groupinst
+
+        child_collections = defaultdict(None)
+        records = []
+        for key, sub in groupby(self._collection, groupfn):
+            sub = list(sub)
+            group_record = [None] * len(sub)
+            if not callable(groupinst):
+                group_record[groupinst_key] = sub[0][groupinst]
+            records.append(group_record)
+            child_collections[len(child_collections)] = sub
+
+        self._collection.data = records
+        self._collection._child_collections = child_collections
+
+        instructions[:] = [list(chain(*instructions))[1:]]
 
 
     def _commit_new_cols(self, instructions):
@@ -143,8 +170,6 @@ class Transaction(object):
         for idx, row in enumerate(self._collection):
             if isinstance(row, Mapping):
                 row = self._collection.data[idx]
-            else:
-                row = list(row)
             for instruction in instructions:
                 instruction(row, self._collection)
             self._collection.data[idx] = row

@@ -23,6 +23,7 @@ from datalib.hcollections import Collection
 
 BASIC_DATA = ((1,2,3),(4,5,6))
 STRING_DATA = (('foo', 'bar', 'baz'),)
+GROUP_DATA = (('a', 'b'), ('a', 'c'), ('a', 'd'), ('b', 'a'))
 
 
 def test_create():
@@ -82,4 +83,19 @@ def test_filter():
 
     col = Collection(BASIC_DATA, filter=(lambda x: x[0] < 2,))
     assert len(col) == 1
+
+
+def test_group():
+    col = Collection(GROUP_DATA)
+    col.group([0])
+    assert len(col) == 2
+    assert col[0][0] == 'a'
+    assert col[1][0] == 'b'
+    assert len(col[0].children) == 3
+
+    col = Collection(GROUP_DATA, group=[0])
+    assert len(col) == 2
+    assert col[0][0] == 'a'
+    assert col[1][0] == 'b'
+    assert len(col[0].children) == 3
 

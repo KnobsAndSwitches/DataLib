@@ -17,6 +17,7 @@
 """Homogeneous data collections."""
 
 from datalib.transaction import Transaction
+from datalib.records import Record, NamedRecord
 
 
 class Collection(object):
@@ -30,14 +31,19 @@ class Collection(object):
     """
 
     def __init__(self, data, **kwargs):
-        self.data = data
+        self.data = [list(x) for x in data]
         self.transaction = Transaction(self)
+
+        # State vars
+        self._child_collections = {}
 
         # Add filters
         def _common_kwarg_handling():
             if 'filter' in kwargs:
                 for filter_fn in kwargs['filter']:
                     self.filter(filter_fn)
+            if 'group' in kwargs:
+                self.group(kwargs['group'])
 
         self._handle_kwargs(_common_kwarg_handling, **kwargs)
 
@@ -47,11 +53,19 @@ class Collection(object):
 
 
     def __iter__(self):
-        return iter(self.data)
+        for idx, record in enumerate(self.data):
+            if idx in self._child_collections:
+                children = self._child_collections[idx]
+            else:
+                children = None
+            yield Record(record, children)
 
 
     def __getitem__(self, key):
-        return self.data[key]
+        if key in self._child_collections:
+            return Record(self.data[key], self._child_collections[key])
+        else:
+            return Record(self.data[key])
 
 
     def __enter__(self):
@@ -97,6 +111,11 @@ class Collection(object):
         self.transaction.add('filter', fn)
 
 
+    def group(self, groupby_list):
+        """Group rows with the same values for the given column positions."""
+        self.transaction.add('group', groupby_list)
+
+
     def _handle_kwargs(self, common_kwarg_handling, **kwargs):
         """Handle kwargs passed in on __init__."""
         with self:
@@ -136,7 +155,20 @@ class NamedCollection(Collection):
         >>> list(col.__iter__())[0]
         {'a': 1, 'b': 2}
         """
-        return (dict(zip(self.names, x)) for x in self.data)
+        for idx, record in enumerate(self.data):
+            if idx in self._child_collections:
+                children = self._child_collections=[idx]
+            else:
+                children = None
+            yield NamedRecord(dict(zip(self.names, record)), children)
+
+
+    def __getitem__(self, key):
+        record = dict(zip(self.names, self.data[key]))
+        if key in self._child_collections:
+            return NamedRecord(record, self._child_collections[key])
+        else:
+            return NamedRecord(record)
 
     
     def add_formatted_column(self, name, fmt):
@@ -144,8 +176,8 @@ class NamedCollection(Collection):
 
         >>> col = NamedCollection(('a', 'b'), (('foo', 'bar'),))
         >>> col.add_formatted_column('c', '{b}, {a}')
-        >>> col[0]
-        ['foo', 'bar', 'bar, foo']
+        >>> col[0] == {'a': 'foo', 'b': 'bar', 'c': 'bar, foo'}
+        True
         """
         for idx, n in enumerate(self.names):
             fmt = fmt.replace('{%s}' % n, '{%s}' % idx)

@@ -21,6 +21,7 @@ from datalib.hcollections import NamedCollection
 
 BASIC_DATA = ('a', 'b', 'c'), [[1,2,3],[4,5,6]]
 STRING_DATA = ('a', 'b', 'c'), (('foo', 'bar', 'baz'),)
+GROUP_DATA = ('a', 'b'), ((1, 2), (1, 3), (1, 4), (2, 1))
 
 
 def test_create_named():
@@ -63,4 +64,19 @@ def test_filter():
 
     col = NamedCollection(*BASIC_DATA, filter=(lambda x: x['a'] < 2,))
     assert len(col) == 1
+
+
+def test_group():
+    col = NamedCollection(*GROUP_DATA)
+    col.group(['a'])
+    assert len(col) == 2
+    assert col[0]['a'] == 1
+    assert col[1]['a'] == 2
+    assert len(col[0].children) == 3
+
+    col = NamedCollection(*GROUP_DATA, group=['a'])
+    assert len(col) == 2
+    assert col[0]['a'] == 1
+    assert col[1]['a'] == 2
+    assert len(col[0].children) == 3
 
