@@ -152,8 +152,6 @@ class Transaction(object):
         child_collections = defaultdict(None)
         records = []
         for key, sub in groupby(self._collection, groupfn):
-            sub = list(sub)
-            print list(sub)
             sub = self._collection.factory(sub)
             group_record = [None] * len(sub)
             if not callable(groupinst):
