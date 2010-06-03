@@ -67,18 +67,14 @@ def test_filter():
 
 
 def test_group():
-    col = NamedCollection(*GROUP_DATA)
-    col.group(['a'])
-    assert len(col) == 2
-    assert col[0]['a'] == 1
-    assert col[1]['a'] == 2
-    assert len(col[0].children) == 3
-    assert type(col) == type(col[0].children)
-
-    col = NamedCollection(*GROUP_DATA, group=['a'])
-    assert len(col) == 2
-    assert col[0]['a'] == 1
-    assert col[1]['a'] == 2
-    assert len(col[0].children) == 3
-    assert type(col) == type(col[0].children)
+    col1 = NamedCollection(*GROUP_DATA)
+    col1.group(['a'])
+    col2 = NamedCollection(*GROUP_DATA, group=['a'])
+    
+    for col in [col1, col2]:
+        assert len(col) == 2
+        assert col[0]['a'] == 1
+        assert col[1]['a'] == 2
+        assert len(col[0].children) == 3
+        assert type(col) == type(col[0].children)
 
