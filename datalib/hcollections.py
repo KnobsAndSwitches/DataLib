@@ -106,6 +106,11 @@ class Collection(object):
         self.transaction.add('new_cols', _do_format)
 
 
+    def factory(self, data):
+        """Returns method to generate similar collection instance."""
+        return type(self)(data)
+
+
     def filter(self, fn):
         """Filter rows that match given function."""
         self.transaction.add('filter', fn)
@@ -186,6 +191,12 @@ class NamedCollection(Collection):
             row.append(fmt.format(*row))
 
         self.transaction.add('new_cols', _do_format)
+
+
+    def factory(self, data):
+        """Generate similar collection"""
+        return type(self)(self.names,
+                ((x[y] for y in self.names) for x in data))
 
 
     def _handle_kwargs(self, common_kwarg_handling, **kwargs):

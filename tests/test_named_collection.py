@@ -73,10 +73,12 @@ def test_group():
     assert col[0]['a'] == 1
     assert col[1]['a'] == 2
     assert len(col[0].children) == 3
+    assert type(col) == type(col[0].children)
 
     col = NamedCollection(*GROUP_DATA, group=['a'])
     assert len(col) == 2
     assert col[0]['a'] == 1
     assert col[1]['a'] == 2
     assert len(col[0].children) == 3
+    assert type(col) == type(col[0].children)
 

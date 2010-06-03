@@ -92,10 +92,12 @@ def test_group():
     assert col[0][0] == 'a'
     assert col[1][0] == 'b'
     assert len(col[0].children) == 3
+    assert type(col) == type(col[0].children)
 
     col = Collection(GROUP_DATA, group=[0])
     assert len(col) == 2
     assert col[0][0] == 'a'
     assert col[1][0] == 'b'
     assert len(col[0].children) == 3
+    assert type(col) == type(col[0].children)
 
