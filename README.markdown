@@ -4,6 +4,17 @@ DataLib is a data-collection manipulation library for Python.
 
 More details to come..
 
+Testing
+=======
+Prerequisites for running the test suite are py.test and pytest-coverage.
+These can be installed like so (this may need to be run as root):
+
+    easy_install py pytest-coverage
+
+To run the test suite:
+
+    make test
+
 License
 =======
 Copyright (C) 2010 Adam Wagner <awagner83@gmail.com>, Kenny Parnell <k.parnell@gmail.com>
