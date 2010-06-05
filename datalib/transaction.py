@@ -137,10 +137,7 @@ class Transaction(object):
 
     def _commit_group(self, instructions):
         """Apply requested group opperations to collection."""
-        try:
-            groupinst = list(chain(*instructions))[0]
-        except IndexError:
-            return
+        groupinst = list(chain(*instructions))[0]
 
         if not callable(groupinst):
             groupfn = lambda x: x[groupinst]
