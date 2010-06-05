@@ -79,4 +79,6 @@ def test_group():
         assert len(col[0].children) == 3
         assert type(col) == type(col[0].children)
         assert set(col[0].children) <= set(col_ref)
+        for row in col:
+            assert len(row) == 2
 

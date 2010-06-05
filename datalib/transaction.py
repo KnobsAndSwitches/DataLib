@@ -150,10 +150,11 @@ class Transaction(object):
                 groupinst_key = groupinst
 
         child_collections = defaultdict(None)
+        record_length = len(self._collection[0])
         records = []
         for key, sub in groupby(self._collection, groupfn):
             sub = self._collection.factory(sub)
-            group_record = [None] * len(sub)
+            group_record = [None] * record_length
             if not callable(groupinst):
                 group_record[groupinst_key] = sub[0][groupinst]
             records.append(group_record)
