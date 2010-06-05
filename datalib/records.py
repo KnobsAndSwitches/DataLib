@@ -32,16 +32,7 @@ class Record(list):
         self.children = children
 
     def __hash__(self):
-        if not self:
-            return 0
-        self_str = ''.join(str(x) for x in self)
-        value = ord(self_str[0]) << 7
-        for char in self_str:
-            value = c_mul(1000003, value) ^ ord(char)
-        value = value ^ len(self_str)
-        if value == -1:
-            value = -2
-        return value
+        return hash(''.join(str(x) for x in self))
 
 
 class NamedRecord(dict):
@@ -60,19 +51,5 @@ class NamedRecord(dict):
         self.children = children
 
     def __hash__(self):
-        if not self:
-            return 0
-        self_str = ''.join(x + str(self[x]) for x in sorted(self))
-        value = ord(self_str[0]) << 7
-        for char in self_str:
-            value = c_mul(1000003, value) ^ ord(char)
-        value = value ^ len(self_str)
-        if value == -1:
-            value = -2
-        return value
-
-
-def c_mul(a, b):
-    return eval(hex((long(a) * b) & 0xFFFFFFFFL)[:-1])
-
+        return hash(''.join(x + str(self[x]) for x in sorted(self)))
 
