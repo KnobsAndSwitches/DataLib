@@ -15,9 +15,15 @@ To run the test suite:
 
     make test
 
+To get a full html coverage report.
+Coverage results will be saved to ./coverage
+
+    make test_html_coverage
+
 License
 =======
-Copyright (C) 2010 Adam Wagner <awagner83@gmail.com>, Kenny Parnell <k.parnell@gmail.com>
+Copyright (C) 2010 Adam Wagner <awagner83@gmail.com>,
+Kenny Parnell <k.parnell@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published 
