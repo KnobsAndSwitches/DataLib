@@ -30,3 +30,20 @@ def test_begin_twice():
     transaction.rollback()
     transaction.begin()
 
+
+def test_commit_filter():
+    ref_collection = Collection([(1,2),(2,3),(3,4)])
+
+    # test impossible filter
+    col1 = ref_collection.factory(ref_collection)
+    t1 = Transaction(col1)
+    t1._commit_filter([lambda x: False])
+    assert col1.data == []
+
+    # something more reasonable
+    col2 = ref_collection.factory(ref_collection)
+    t2 = Transaction(col2)
+    t2._commit_filter([lambda x: x[0] > 2])
+    assert len(col2) == 1
+    assert set(col2) < set(ref_collection)
+
