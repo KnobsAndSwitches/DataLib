@@ -31,6 +31,18 @@ class Record(list):
         super(Record, self).__init__(iterable)
         self.children = children
 
+    def __hash__(self):
+        if not self:
+            return 0
+        self_str = ''.join(str(x) for x in self)
+        value = ord(self_str[0]) << 7
+        for char in self_str:
+            value = c_mul(1000003, value) ^ ord(char)
+        value = value ^ len(self_str)
+        if value == -1:
+            value = -2
+        return value
+
 
 class NamedRecord(dict):
     """Key based collection record, with support for nested collections.
@@ -46,5 +58,10 @@ class NamedRecord(dict):
     def __init__(self, mapping, children=None):
         super(NamedRecord, self).__init__(mapping)
         self.children = children
+
+
+
+def c_mul(a, b):
+    return eval(hex((long(a) * b) & 0xFFFFFFFFL)[:-1])
 
 
