@@ -76,6 +76,28 @@ def test_transaction_with():
     assert col[0][3] == 'foo, bar'
 
 
+def test_transaction_fail():
+    col = Collection(STRING_DATA)
+    col_ref = Collection(STRING_DATA)
+
+    assert set(col) == set(col_ref)
+
+    class SomeRandomError(Exception):
+        pass
+
+    try:
+        with col:
+            col.add_formatted_column('{0}, {1}')
+            raise SomeRandomError
+    except SomeRandomError:
+        pass
+    assert set(col) == set(col_ref)
+
+    with col:
+        col.add_formatted_column('{0}, {1}')
+    assert set(col) != set(col_ref)
+
+
 def test_filter():
     col = Collection(BASIC_DATA)
     col.filter(lambda x: x[0] < 2)
