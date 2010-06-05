@@ -67,6 +67,7 @@ def test_filter():
 
 
 def test_group():
+    col_ref = NamedCollection(*GROUP_DATA)
     col1 = NamedCollection(*GROUP_DATA)
     col1.group(['a'])
     col2 = NamedCollection(*GROUP_DATA, group=['a'])
@@ -77,4 +78,5 @@ def test_group():
         assert col[1]['a'] == 2
         assert len(col[0].children) == 3
         assert type(col) == type(col[0].children)
+        assert set(col[0].children) <= set(col_ref)
 

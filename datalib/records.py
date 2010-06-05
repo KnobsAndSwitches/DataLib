@@ -59,6 +59,17 @@ class NamedRecord(dict):
         super(NamedRecord, self).__init__(mapping)
         self.children = children
 
+    def __hash__(self):
+        if not self:
+            return 0
+        self_str = ''.join(x + str(self[x]) for x in sorted(self))
+        value = ord(self_str[0]) << 7
+        for char in self_str:
+            value = c_mul(1000003, value) ^ ord(char)
+        value = value ^ len(self_str)
+        if value == -1:
+            value = -2
+        return value
 
 
 def c_mul(a, b):
