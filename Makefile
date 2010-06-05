@@ -1,6 +1,6 @@
 test: 
-	py.test --cover=datalib
+	py.test --doctest-modules --cover=datalib
 
 test_html_coverage:
-	py.test --cover-report=html --cover=datalib
+	py.test --doctest-modules --cover-report=html --cover=datalib
 
