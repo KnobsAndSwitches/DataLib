@@ -17,7 +17,8 @@
 
 from py.test import raises
 
-from datalib.transaction import TransactionAlreadyActiveError, Transaction
+from datalib.transaction import (DependencyResolutionError, 
+        TransactionAlreadyActiveError, Transaction)
 from datalib.hcollections import Collection
 
 
@@ -64,4 +65,23 @@ def test_commit_group():
     transaction._commit_group([lambda x: x[1]])
     assert len(col) == 3
     assert set(col[0].children) < set(ref_collection)
+
+
+def test_commit_error():
+    transaction = Transaction(Collection([[1]]))
+
+    # test long way
+    transaction.begin()
+    transaction.add('group', 1) # <- Column "1" doesn't exist.
+    raises(DependencyResolutionError, transaction.commit)
+
+    # shorter test (but this does the same thing)
+    raises(DependencyResolutionError, transaction.add, 'group', 1)
+
+    # check exception error message
+    try:
+        transaction.add('group', 1)
+    except DependencyResolutionError, e:
+        assert str(e) == "[('group', 'list index out of range')]"
+
 

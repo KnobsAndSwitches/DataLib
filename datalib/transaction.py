@@ -21,7 +21,14 @@ from itertools import ifilter, chain, groupby
 
 
 class DependencyResolutionError(Exception):
-    pass
+    """Raised when problems with transaction-instruction could not be resolved
+    by running other instructions in the transaction."""
+
+    def __init__(self, errors):
+        self.errors = errors
+
+    def __str__(self):
+        return str(self.errors)
 
 
 class TransactionAlreadyActiveError(Exception):
@@ -105,14 +112,15 @@ class Transaction(object):
             try:
                 commit_method(self, self._instructions[name])
             except IndexError, ex:
-                errors.append(ex)
+                errors.append((name, str(ex)))
                 first_err_at = min(first_err_at, idx)
 
         if errors:
             if errors != last_errors:
                 self.commit(first_err_at, errors)
             else:
-                raise DependencyResolutionError
+                self.rollback()
+                raise DependencyResolutionError(errors)
         else:
             self.active = False
             self.instructions = defaultdict(list)
