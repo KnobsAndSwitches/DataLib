@@ -19,7 +19,7 @@ from py.test import raises
 
 from datalib.transaction import (DependencyResolutionError, 
         TransactionAlreadyActiveError, Transaction)
-from datalib.hcollections import Collection
+from datalib.hcollections import Collection, NamedCollection
 
 
 def test_begin_twice():
@@ -83,5 +83,9 @@ def test_commit_error():
         transaction.add('group', 1)
     except DependencyResolutionError, e:
         assert str(e) == "[('group', 'list index out of range')]"
+
+    # check for errors in named-collections as well
+    transaction = Transaction(NamedCollection(['a'], [[1]]))
+    raises(DependencyResolutionError, transaction.add, 'group', 'b')
 
 

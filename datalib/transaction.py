@@ -111,7 +111,7 @@ class Transaction(object):
                 continue
             try:
                 commit_method(self, self._instructions[name])
-            except IndexError, ex:
+            except (IndexError, ValueError), ex:
                 errors.append((name, str(ex)))
                 first_err_at = min(first_err_at, idx)
 
