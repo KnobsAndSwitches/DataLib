@@ -42,7 +42,7 @@ class Transaction(object):
 
 
     def begin(self):
-        """Activate interception of datagrid mutate request.
+        """Activate interception of collection mutate request.
 
         Changes to a collection made while a transaction is active will
         not appear till the transaction is committed."""
@@ -54,7 +54,7 @@ class Transaction(object):
 
 
     def add(self, type, instruction):
-        """Add row-level instruction to todo list on commit.
+        """Add row-level instruction to transaction.
 
         >>> from datalib.hcollections import Collection
         >>> t = Transaction(Collection([]))
@@ -136,7 +136,7 @@ class Transaction(object):
 
 
     def _commit_group(self, instructions):
-        """Apply requested  group opperations to collection."""
+        """Apply requested  group operations to collection."""
         groupinst = instructions[0]
 
         if not callable(groupinst):
