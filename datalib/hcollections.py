@@ -118,7 +118,8 @@ class Collection(object):
 
     def group(self, groupby_list):
         """Group rows with the same values for the given column positions."""
-        self.transaction.add('group', groupby_list)
+        for groupby in groupby_list:
+            self.transaction.add('group', groupby)
 
 
     def _handle_kwargs(self, common_kwarg_handling, **kwargs):

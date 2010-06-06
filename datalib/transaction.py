@@ -137,7 +137,7 @@ class Transaction(object):
 
     def _commit_group(self, instructions):
         """Apply requested group opperations to collection."""
-        groupinst = list(chain(*instructions))[0]
+        groupinst = instructions[0]
 
         if not callable(groupinst):
             groupfn = lambda x: x[groupinst]
@@ -160,7 +160,7 @@ class Transaction(object):
         self._collection.data = records
         self._collection._child_collections = child_collections
 
-        instructions[:] = [list(chain(*instructions))[1:]]
+        instructions[:] = instructions[1:]
 
 
     def _commit_new_cols(self, instructions):
