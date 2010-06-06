@@ -47,3 +47,21 @@ def test_commit_filter():
     assert len(col2) == 1
     assert set(col2) < set(ref_collection)
 
+
+def test_commit_group():
+    ref_collection = Collection([(1,2),(1,3),(2,4)])
+
+    # index-based grouping
+    col = ref_collection.factory(ref_collection)
+    transaction = Transaction(col)
+    transaction._commit_group([0])
+    assert len(col) == 2
+    assert set(col[0].children) < set(ref_collection)
+
+    # fn based grouping
+    col = ref_collection.factory(ref_collection)
+    transaction = Transaction(col)
+    transaction._commit_group([lambda x: x[1]])
+    assert len(col) == 3
+    assert set(col[0].children) < set(ref_collection)
+

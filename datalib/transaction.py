@@ -136,7 +136,7 @@ class Transaction(object):
 
 
     def _commit_group(self, instructions):
-        """Apply requested group opperations to collection."""
+        """Apply requested  group opperations to collection."""
         groupinst = instructions[0]
 
         if not callable(groupinst):
@@ -145,6 +145,8 @@ class Transaction(object):
                 groupinst_key = self._collection.names.index(groupinst)
             else:
                 groupinst_key = groupinst
+        else:
+            groupfn = groupinst
 
         child_collections = defaultdict(None)
         record_length = len(self._collection[0])
