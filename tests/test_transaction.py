@@ -59,12 +59,22 @@ def test_commit_group():
     assert len(col) == 2
     assert set(col[0].children) < set(ref_collection)
 
+    # aka
+    col2 = ref_collection.factory(ref_collection)
+    col2.transaction.add('group', 0)
+    assert set(col2) == set(col)
+
     # fn based grouping
     col = ref_collection.factory(ref_collection)
     transaction = Transaction(col)
     transaction._commit_group([lambda x: x[1]])
     assert len(col) == 3
     assert set(col[0].children) < set(ref_collection)
+
+    # aka
+    col2 = ref_collection.factory(ref_collection)
+    col2.transaction.add('group', lambda x: x[1])
+    assert set(col2) == set(col)
 
 
 def test_commit_error():
