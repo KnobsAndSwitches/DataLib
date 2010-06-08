@@ -95,3 +95,10 @@ def test_commit_new_cols():
     transaction._commit_new_cols([lambda x, y: x.append('test')])
     assert len(col[0]) == 2
 
+    # aka
+    col2 = Collection([[1]])
+    col2.transaction.add('new_cols', lambda x, y: x.append('test'))
+    assert len(col2[0]) == 2
+    assert set(col) == set(col2)
+
+
