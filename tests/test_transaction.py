@@ -89,3 +89,9 @@ def test_commit_error():
     raises(DependencyResolutionError, transaction.add, 'group', 'b')
 
 
+def test_commit_new_cols():
+    col = Collection([[1]])
+    transaction = Transaction(col)
+    transaction._commit_new_cols([lambda x, y: x.append('test')])
+    assert len(col[0]) == 2
+
