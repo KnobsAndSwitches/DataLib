@@ -101,14 +101,17 @@ def test_commit_error():
 
 def test_commit_new_cols():
     col = Collection([[1]])
-    transaction = Transaction(col)
-    transaction._commit_new_cols([lambda x, y: x.append('test')])
+    col.transaction.add('new_cols', lambda x, y: 'test')
     assert len(col[0]) == 2
 
-    # aka
-    col2 = Collection([[1]])
-    col2.transaction.add('new_cols', lambda x, y: x.append('test'))
-    assert len(col2[0]) == 2
-    assert set(col) == set(col2)
 
+def test_error_correction():
+    col = Collection([[1]])
+    col.transaction.begin()
+    col.transaction.add('group', 1)
+    col.transaction.add('new_cols', lambda x, y: 'test')
+    col.transaction.commit()
+
+    assert len(col[0]) == 2
+    assert len(col[0].children) == 1
 

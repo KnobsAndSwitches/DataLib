@@ -32,6 +32,7 @@ class Collection(object):
 
     def __init__(self, data, **kwargs):
         self.data = [list(x) for x in data]
+        self.width = 0 if not self.data else len(self.data[0])
         self.transaction = Transaction(self)
 
         # State vars
@@ -101,7 +102,7 @@ class Collection(object):
         'c, d'
         """
         def _do_format(row, collection):
-            row.append(fmt.format(*row))
+            return fmt.format(*row)
 
         self.transaction.add('new_cols', _do_format)
 
@@ -189,7 +190,7 @@ class NamedCollection(Collection):
             fmt = fmt.replace('{%s}' % n, '{%s}' % idx)
         def _do_format(row, collection):
             collection.names.append(name)
-            row.append(fmt.format(*row))
+            return fmt.format(*row)
 
         self.transaction.add('new_cols', _do_format)
 

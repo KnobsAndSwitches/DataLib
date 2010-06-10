@@ -20,6 +20,17 @@ from collections import defaultdict, Mapping
 from itertools import ifilter, chain, groupby
 
 
+class ValueNotProcessedError(Exception):
+    """Raised when a column that does not have a processed value is accessed."""
+    pass
+
+
+class PlaceHolderColumn(object):
+    """Placed in row for new column additions until they are processed."""
+    def __str__(self):
+        raise ValueNotProcessedError
+
+
 class DependencyResolutionError(Exception):
     """Raised when problems with transaction-instruction could not be resolved
     by running other instructions in the transaction."""
@@ -104,6 +115,7 @@ class Transaction(object):
         """Apply requested instructions to bound collection."""
         # Make sure our dataset is mutable
         self._collection.data = list(self._collection.data)
+        self._allocate_new_cols()
         errors, first_err_at = [], 99
         
         for idx, (name, commit_method) in enumerate(self.commit_methods):
@@ -124,6 +136,17 @@ class Transaction(object):
         else:
             self.active = False
             self.instructions = defaultdict(list)
+
+    
+    def _allocate_new_cols(self):
+        """Allocate PlaceHolderColumn instances for each new column."""
+        for idx, instruction in enumerate(self._instructions['new_cols']):
+            instruction.column_idx = self._collection.width + idx
+
+        placeholders = ([PlaceHolderColumn] * 
+                len(self._instructions['new_cols']))
+        for row in self._collection.data:
+            row.extend(placeholders)
 
 
     def _commit_filter(self, instructions):
@@ -175,11 +198,9 @@ class Transaction(object):
 
     def _commit_new_cols(self, instructions):
         """Add calculated and formatted columns to collection."""
-        for idx, row in enumerate(self._collection):
-            if isinstance(row, Mapping):
-                row = self._collection.data[idx]
+        for idx, row in enumerate(self._collection.data):
             for instruction in instructions:
-                instruction(row, self._collection)
+                row[instruction.column_idx] = instruction(row, self._collection)
             self._collection.data[idx] = row
 
 
