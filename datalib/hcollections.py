@@ -210,6 +210,18 @@ class NamedCollection(Collection):
         self.transaction.add('new_cols', _do_format)
 
 
+    def add_calculated_column(self, name, calculation):
+        """Add new named calculated column"""
+        for idx, n in enumerate(self.names):
+            calculation = calculation.replace('{%s}' % n, '{%s}' % idx)
+        calculation = calculation.replace('{', 'r[').replace('}', ']')
+
+        self.names.append(name)
+
+        exec '_do_calc = lambda r, c: ' + calculation
+        self.transaction.add('new_cols', _do_calc)
+
+
     def factory(self, data):
         """Generate similar collection"""
         return type(self)(self.names,
@@ -223,4 +235,8 @@ class NamedCollection(Collection):
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(*col)
+
+            if 'calculated_columns' in kwargs:
+                for col in kwargs['calculated_columns']:
+                    self.add_calculated_column(*col)
 

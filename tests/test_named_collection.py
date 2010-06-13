@@ -57,6 +57,15 @@ def test_formatted_columns():
     assert list(col)[0]['d'] == 'baz bar foo'
 
 
+def test_calculated_columns():
+    col = NamedCollection(*BASIC_DATA)
+    col.add_calculated_column("d", "{a} + {b}")
+    assert col[0]['d'] == 3
+
+    col = NamedCollection(*BASIC_DATA, calculated_columns=(('d', '{a} + {b}',),))
+    assert col[1]['d'] == 9
+
+
 def test_filter():
     col = NamedCollection(*BASIC_DATA)
     col.filter(lambda x: x['a'] < 2)
