@@ -20,7 +20,7 @@ from datalib.hcollections import NamedCollection
 
 
 BASIC_DATA = ('a', 'b', 'c'), [[1,2,3],[4,5,6]]
-STRING_DATA = ('a', 'b', 'c'), (('foo', 'bar', 'baz'),)
+STRING_DATA = ('a', 'b', 'c'), (('foo', 'bar', 'baz'),('zip','zap','biff'))
 GROUP_DATA = ('a', 'b'), ((1, 2), (1, 3), (1, 4), (2, 1))
 
 
@@ -51,6 +51,7 @@ def test_formatted_columns():
 
     col.add_formatted_column('d', '{c} {a} {b}')
     assert list(col)[0]['d'] == 'baz foo bar'
+    assert len(col.names) == 4
 
     col = NamedCollection(names, data, 
             formatted_columns=(('d', '{c} {b} {a}'),))

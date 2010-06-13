@@ -201,10 +201,11 @@ class NamedCollection(Collection):
         >>> col[0] == {'a': 'foo', 'b': 'bar', 'c': 'bar, foo'}
         True
         """
+        self.names.append(name)
+
         for idx, n in enumerate(self.names):
             fmt = fmt.replace('{%s}' % n, '{%s}' % idx)
         def _do_format(row, collection):
-            collection.names.append(name)
             return fmt.format(*row)
 
         self.transaction.add('new_cols', _do_format)
