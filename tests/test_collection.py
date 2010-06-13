@@ -33,6 +33,11 @@ def test_create():
         assert list(row) == list(BASIC_DATA[idx])
 
 
+def test_coercion():
+    col = Collection(BASIC_DATA, coerce={0: float, 2: float})
+    assert [type(x) for x in col[0]] == [float, int, float]
+
+
 def test_formatted_columns():
     col = Collection(STRING_DATA)
     col.add_formatted_column('{2} {0} {1}')

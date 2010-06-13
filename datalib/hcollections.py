@@ -139,6 +139,10 @@ class Collection(object):
         """Handle kwargs passed in on __init__."""
         with self:
             common_kwarg_handling()
+            if 'coerce' in kwargs:
+                for i in xrange(len(self.data)):
+                    for idx, type_ in kwargs['coerce'].iteritems():
+                        self.data[i][idx] = type_(self.data[i][idx])
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(col)
