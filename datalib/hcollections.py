@@ -237,10 +237,14 @@ class NamedCollection(Collection):
         """Handle kwargs passed in on __init__."""
         with self:
             common_kwarg_handling()
+            if 'coerce' in kwargs:
+                for idx, type_ in kwargs['coerce'].iteritems():
+                    idx = self.names.index(idx)
+                    for row in self.data:
+                        row[idx] = type_(row[idx])
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(*col)
-
             if 'calculated_columns' in kwargs:
                 for col in kwargs['calculated_columns']:
                     self.add_calculated_column(*col)

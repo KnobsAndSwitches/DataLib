@@ -35,6 +35,11 @@ def test_create_named():
         assert list(row) == list(data[idx])
 
 
+def test_coercion():
+    col = NamedCollection(*BASIC_DATA, coerce={'a': float, 'c': float})
+    assert [type(x) for x in col.data[0]] == [float, int, float]
+
+
 def test_dict_rows():
     names, data = BASIC_DATA
     col = NamedCollection(names, data)
