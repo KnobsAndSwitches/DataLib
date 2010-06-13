@@ -16,6 +16,8 @@
 
 """Homogeneous data collections."""
 
+from code import compile_command
+
 from datalib.transaction import Transaction
 from datalib.records import Record, NamedRecord
 
@@ -107,6 +109,16 @@ class Collection(object):
         self.transaction.add('new_cols', _do_format)
 
 
+    def add_calculated_column(self, calculation):
+        """Add new column whose value is the result of the given calculation."""
+        # replace place-holders with dictionary refs
+        calculation = calculation.replace('{', 'r[').replace('}', ']')
+
+        # create new function and return
+        exec '_do_calc = lambda r, c: ' + calculation
+        self.transaction.add('new_cols', _do_calc)
+
+
     def factory(self, data):
         """Returns method to generate similar collection instance."""
         return type(self)(data)
@@ -130,6 +142,9 @@ class Collection(object):
             if 'formatted_columns' in kwargs:
                 for col in kwargs['formatted_columns']:
                     self.add_formatted_column(col)
+            if 'calculated_columns' in kwargs:
+                for col in kwargs['calculated_columns']:
+                    self.add_calculated_column(col)
 
 
 class NamedCollection(Collection):

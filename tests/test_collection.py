@@ -42,6 +42,15 @@ def test_formatted_columns():
     assert col[0][3] == 'baz bar foo'
 
 
+def test_calculated_columns():
+    col = Collection(BASIC_DATA)
+    col.add_calculated_column('{0} + {1}')
+    assert col[0][3] == 3
+
+    col = Collection(BASIC_DATA, calculated_columns=('{0} + {1}',))
+    assert col[1][3] == 9
+
+
 def test_transaction_verbose():
     col = Collection(STRING_DATA)
     assert col.transaction.active == False
